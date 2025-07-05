@@ -2,40 +2,168 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>To Do Agenda App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Semantic UI CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <title>Todo App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #eef2f3, #8e9eab);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        form {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            width: 250px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), inset -2px -2px 5px rgba(255,255,255,0.7);
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .task-columns {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .column {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .column h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #ffffff;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 15px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2), -5px -5px 15px rgba(255,255,255,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateY(-5px) rotateX(2deg);
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.3);
+        }
+
+        s {
+            color: gray;
+        }
+
+        a {
+            margin-left: 0.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        a[href*="/update"] {
+            color: #27ae60;
+            background-color: #ecf9f0;
+        }
+
+        a[href*="/delete"] {
+            color: #e74c3c;
+            background-color: #fdecea;
+        }
+
+        a:hover {
+            transform: scale(1.1);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
-    <div class="ui container" style="margin-top: 50px;">
-        <h1 class="ui center aligned header">To Do Agenda App</h1>
-
-        <form class="ui form" action="/add" method="post">
-            <div class="field">
-                <label>Task Title</label>
-                <input type="text" name="title" placeholder="Enter Task..." required>
-            </div>
-            <button class="ui blue button" type="submit">Add</button>
-        </form>
-
-        <hr>
-
-        {% for todo in todo_list %}
-        <div class="ui segment">
-            <p class="ui big header">{{ todo.id }} | {{ todo.title }}</p>
-
-            {% if not todo.complete %}
-                <span class="ui gray label">Not Complete</span>
-            {% else %}
-                <span class="ui green label">Completed</span>
-            {% endif %}
-
-            <a class="ui blue button" href="/update/{{ todo.id }}">Toggle</a>
-            <a class="ui red button" href="/delete/{{ todo.id }}">Delete</a>
+    <h1>📝 My Split View Todo List</h1>
+    <form action="/add" method="post">
+        <input type="text" name="title" placeholder="New Task" required>
+        <button type="submit">Add</button>
+    </form>
+    <div class="task-columns">
+        <div class="column">
+            <h2>✅ Completed</h2>
+            <ul>
+                {% for todo in todo_list %}
+                    {% if todo.complete %}
+                        <li>
+                            <div><s>{{ todo.title }}</s></div>
+                            <div>
+                                <a href="/update/{{ todo.id }}">↩</a>
+                                <a href="/delete/{{ todo.id }}">✘</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         </div>
-        {% endfor %}
+        <div class="column">
+            <h2>🕐 Incomplete</h2>
+            <ul>
+                {% for todo in todo_list %}
+                    {% if not todo.complete %}
+                        <li>
+                            <div>{{ todo.title }}</div>
+                            <div>
+                                <a href="/update/{{ todo.id }}">✔</a>
+                                <a href="/delete/{{ todo.id }}">✘</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </body>
 </html>
